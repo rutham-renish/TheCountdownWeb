@@ -81,118 +81,217 @@
   </div>
   <p class="small-text"> <br><br><br><br><br><br><br><br><br><br><br><br> </p>
   <p class="small-text">Copyright © 2025 Rutham Renish - <a class="small-text" href="/LICENSE">Licensed by MIT</a></p>
-  <audio id="waitAudio" preload="auto" loop src="/waitmusic.mp3"></audio>
-  <audio id="outroAudio" preload="auto" loop src="/outromusic.mp3"></audio>
+  <audio id="waitAudio" preload="metadata" loop>
+  <source src="/waitmusic.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="outroAudio" preload="metadata" loop>
+  <source src="/outromusic.mp3" type="audio/mpeg">
+</audio>
 
   <script>
-    const target = new Date(2026, 11, 5, 12, 0, 0, 0).getTime();
-    const overlay = document.getElementById("tapOverlay");
-    const cd      = document.getElementById("countdownContainer");
-    const rec     = document.getElementById("recommendedAudio");
-    const fin     = document.getElementById("finishedMessage");
-    const waitA   = document.getElementById("waitAudio");
-    const outroA  = document.getElementById("outroAudio");
+  const target = new Date(2026, 11, 5, 12, 0, 0, 0).getTime();
 
-    let state = 0; // 0=not started,1=wait playing,2=ready-outr,3=outro
+  const overlay = document.getElementById("tapOverlay");
+  const cd = document.getElementById("countdownContainer");
+  const rec = document.getElementById("recommendedAudio");
+  const fin = document.getElementById("finishedMessage");
 
-    // mute both
-    waitA.muted = outroA.muted = true;
+  const waitA = document.getElementById("waitAudio");
+  const outroA = document.getElementById("outroAudio");
 
-    function init() {
-      const now = Date.now();
-      if (now >= target) {
-        // already past zero → go to finished state
-        state = 2;
-        cd.style.display = "none";
-        fin.style.display = "flex";
-        overlay.textContent = "Tap to see our final message";
-        overlay.classList.remove("hidden");
-      } else {
-        overlay.textContent = "Tap to see and hear the countdown - Audio Recommended";
-        overlay.classList.remove("hidden");
-      }
+  let state = 0;
+  // 0 = waiting for first tap
+  // 1 = countdown active
+  // 2 = outro ready
+  // 3 = outro playing
+  // 4 = finished
+
+  // Safari-safe preload
+  waitA.load();
+  outroA.load();
+
+  function init() {
+    const now = Date.now();
+
+    if (now >= target) {
+      state = 2;
+
+      cd.style.display = "none";
+      fin.style.display = "flex";
+
+      overlay.textContent = "Tap to hear the final music";
+      overlay.classList.remove("hidden");
+    } else {
+      overlay.textContent =
+        "Tap to see and hear the countdown - Audio Recommended";
+
+      overlay.classList.remove("hidden");
     }
+  }
 
-    overlay.addEventListener("click", () => {
-      const now = Date.now(), diff = target - now;
-      if (state === 0 && now < target) {
-        // start wait
+  overlay.addEventListener("click", async () => {
+    try {
+
+      // START COUNTDOWN MUSIC
+      if (state === 0) {
+
         state = 1;
+
         overlay.classList.add("hidden");
-        waitA.muted = false;
-        waitA.play().catch(() => {});
-        rec.textContent = "Audio Recommended – Healin On The Move, Doctornewflow";
+
+        waitA.currentTime = 0;
+
+        await waitA.play();
+
+        rec.textContent =
+          "Audio Recommended – Healin On The Move, Doctornewflow";
+
         rec.style.display = "block";
-      } else if (state === 2) {
-        // start outro
+      }
+
+      // START OUTRO MUSIC
+      else if (state === 2) {
+
         state = 3;
+
         overlay.classList.add("hidden");
+
+        waitA.pause();
+        waitA.currentTime = 0;
+
         rec.style.display = "none";
-        const offset = diff > 0
-          ? (61000 - diff) / 1000
-          : 61;
-        outroA.muted = false;
-        outroA.currentTime = offset > outroA.duration ? 0 : offset;
-        outroA.play().catch(() => {});
-        rec.textContent = "Audio Recommended A LOT – Xenogenisis, TheFatRat";
+
+        const diff = target - Date.now();
+
+        let offset = 61;
+
+        if (diff > 0) {
+          offset = (61000 - diff) / 1000;
+        }
+
+        // Safari-safe seeking
+        if (!isNaN(outroA.duration)) {
+
+          const safeTime = Math.min(
+            Math.max(offset, 0),
+            Math.max(outroA.duration - 0.1, 0)
+          );
+
+          outroA.currentTime = safeTime;
+
+        } else {
+
+          outroA.currentTime = 0;
+
+        }
+
+        await outroA.play();
+
+        rec.textContent =
+          "Audio Recommended A LOT – Xenogenesis, TheFatRat";
+
         rec.style.display = "block";
+
         if (diff <= 0) {
           cd.style.display = "none";
           fin.style.display = "flex";
         }
       }
-    });
 
-    function schedule() {
-      if (state === 1) {
-        const diff = target - Date.now();
-        if (diff <= 60000 && diff > 0) {
-          // switch to outro-ready
-          state = 2;
-          waitA.pause();
-          waitA.currentTime = 0;
-          rec.style.display = "none";
-          overlay.textContent = "Tap to countdown - Audio Recommended A LOT";
-          overlay.classList.remove("hidden");
-        }
-      }
+    } catch (err) {
+
+      console.log("Audio playback failed:", err);
+
+      alert(
+        "Audio could not play. Try turning off silent mode or checking browser permissions."
+      );
+
     }
+  });
 
-    function update() {
-      const now = Date.now(), diff = target - now;
+  function schedule() {
 
-      // **NEW**: handle zero here
-      if (diff <= 0) {
-        clearInterval(timer);
-        // hide countdown & rec
-        cd.style.display = "none";
+    if (state === 1) {
+
+      const diff = target - Date.now();
+
+      if (diff <= 60000 && diff > 0) {
+
+        state = 2;
+
+        waitA.pause();
+        waitA.currentTime = 0;
+
         rec.style.display = "none";
-        // show finished
+
+        overlay.textContent =
+          "Tap to start final countdown - Audio Recommended A LOT";
+
+        overlay.classList.remove("hidden");
+      }
+    }
+  }
+
+  function update() {
+
+    const now = Date.now();
+
+    const diff = target - now;
+
+    // FINISHED
+    if (diff <= 0) {
+
+      if (state !== 3 && state !== 4) {
+
+        state = 4;
+
+        cd.style.display = "none";
+
+        rec.style.display = "none";
+
         fin.style.display = "flex";
-        return;
       }
 
-      // update numbers
-      let d = diff;
-      const w    = Math.floor(d / 604800000); d %= 604800000;
-      const days = Math.floor(d / 86400000);  d %= 86400000;
-      const hrs  = Math.floor(d / 3600000);   d %= 3600000;
-      const mins = Math.floor(d / 60000);     d %= 60000;
-      const secs = Math.floor(d / 1000), ms = d % 1000;
-      document.getElementById("weeks").textContent        = w;
-      document.getElementById("days").textContent         = days;
-      document.getElementById("hours").textContent        = hrs;
-      document.getElementById("minutes").textContent      = mins;
-      document.getElementById("seconds").textContent      = secs;
-      document.getElementById("milliseconds").textContent = ms;
-
-      schedule();
+      return;
     }
 
-    init();
-    const timer = setInterval(update, 1);
-    update();
-  </script>
+    let d = diff;
+
+    const weeks = Math.floor(d / 604800000);
+    d %= 604800000;
+
+    const days = Math.floor(d / 86400000);
+    d %= 86400000;
+
+    const hours = Math.floor(d / 3600000);
+    d %= 3600000;
+
+    const minutes = Math.floor(d / 60000);
+    d %= 60000;
+
+    const seconds = Math.floor(d / 1000);
+
+    const milliseconds = d % 1000;
+
+    document.getElementById("weeks").textContent = weeks;
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = seconds;
+    document.getElementById("milliseconds").textContent =
+      milliseconds.toString().padStart(3, "0");
+
+    schedule();
+  }
+
+  init();
+
+  // 50ms is MUCH safer than 1ms
+  const timer = setInterval(update, 50);
+
+  update();
+</script>
   <script src="/celebration.js"></script>
 </body>
 </html>
