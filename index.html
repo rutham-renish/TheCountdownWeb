@@ -3,196 +3,404 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Countdown Web</title>
-  <link rel="icon" type="image/jpeg" href="https://www.publicdomainpictures.net/pictures/80000/velka/clock-icon.jpg">
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="3d6feec7-b8c6-403a-a721-f5254bb3151a"></script>
+  <title>The RR Summer Countdown</title>
+
   <style>
-    @font-face { font-family: "TheRRs"; src: url("/therrfont.ttf") format("truetype"); }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; }
+    @font-face {
+      font-family: "TheRRs";
+      src: url("/the-rrs.ttf") format("truetype");
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
     body {
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      background: #2a2a2a; color: #dedede; font-family: "TheRRs", sans-serif;
-      font-size: 16px; line-height: 1.2; position: relative; overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #2a2a2a;
+      color: #dedede;
+      font-family: "TheRRs", sans-serif;
+      position: relative;
+      overflow: hidden;
+      font-size: 16px;
+      line-height: 1.2;
     }
-    .countdown { display: flex; gap: 1.5rem; text-align: center; }
-    .time-segment { display: flex; flex-direction: column; min-width: 4rem; }
-    .number {
-      display: inline-block; width: 4ch; font-size: 3rem; line-height: 1;
-      color: #4193c9; text-align: center; font-variant-numeric: tabular-nums;
+
+    .countdown {
+      display: flex;
+      gap: 1.5rem;
+      text-align: center;
     }
-    .label {
-      margin-top: .25rem; font-size: 1rem; color: #5cc93b;
-      text-transform: uppercase; letter-spacing: .05em;
+
+    .time-segment {
+      display: flex;
+      flex-direction: column;
+      min-width: 4rem;
     }
+
+    .time-segment .number {
+      display: inline-block;
+      width: 4ch;
+      font-size: 3rem;
+      line-height: 1;
+      color: #4193c9;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-segment .label {
+      margin-top: .25rem;
+      font-size: 1rem;
+      color: #5cc93b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
     #recommendedAudio {
-      margin-top: 1rem; font-size: 1rem; display: none;
+      margin-top: 1rem;
+      font-size: 1rem;
+      display: none;
     }
+
     .finished-message {
-      display: none; flex-direction: column; align-items: center; text-align: center;
-      gap: 1rem; padding: 0 1rem;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      padding: 0 1rem;
+      font-family: "TheRRs", sans-serif;
     }
-    .finished-title { display: flex; gap: .5rem; font-size: 3rem; }
-    .word-happy { color: #5cc93b; }
-    .word-summer { color: #dedede; }
-    .word-holiday { color: #4193c9; }
+
+    .finished-title {
+      display: flex;
+      gap: .5rem;
+      font-size: 3rem;
+    }
+
+    .word-happy {
+      color: #5cc93b;
+    }
+
+    .word-summer {
+      color: #4193c9;
+    }
+
+    .word-holiday {
+      color: #dedede;
+    }
+
     .small-text {
-      font-size: .875rem; color: #dedede; margin: .25rem 0;
+      font-size: .875rem;
+      color: #dedede;
+      margin: .25rem 0;
     }
+
     .medium-text {
-      font-size: 1.25rem; color: #4193c9; margin: .5rem 0 .25rem;
+      font-size: 1.25rem;
+      color: #4193c9;
+      margin: .5rem 0 .25rem;
     }
-    #tapOverlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(42,42,42,.95); color: #dedede;
-      display: flex; justify-content: center; align-items: center;
-      text-align: center; font-size: 1.2rem; cursor: pointer; z-index: 9999;
+
+    #firstTapOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(42,42,42,.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "TheRRs", sans-serif;
+      color: #dedede;
+      text-align: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 9999;
       padding: 1rem;
     }
-    #tapOverlay.hidden { display: none; }
+
+    #firstTapOverlay.hidden {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
-  <div id="tapOverlay">Tap to see and hear the countdown - Audio Recommended</div>
+
+  <div id="firstTapOverlay">
+    Tap to see and hear The RR Countdown. Increase your volume to see!
+  </div>
 
   <div class="countdown" id="countdownContainer">
-    <div class="time-segment"><span id="weeks" class="number">0</span><span class="label">Weeks</span></div>
-    <div class="time-segment"><span id="days" class="number">0</span><span class="label">Days</span></div>
-    <div class="time-segment"><span id="hours" class="number">0</span><span class="label">Hours</span></div>
-    <div class="time-segment"><span id="minutes" class="number">0</span><span class="label">Minutes</span></div>
-    <div class="time-segment"><span id="seconds" class="number">0</span><span class="label">Seconds</span></div>
-    <div class="time-segment"><span id="milliseconds" class="number">0</span><span class="label">Ms</span></div>
+
+    <div class="time-segment">
+      <span class="number" id="weeks">0</span>
+      <span class="label">Weeks</span>
+    </div>
+
+    <div class="time-segment">
+      <span class="number" id="days">0</span>
+      <span class="label">Days</span>
+    </div>
+
+    <div class="time-segment">
+      <span class="number" id="hours">0</span>
+      <span class="label">Hours</span>
+    </div>
+
+    <div class="time-segment">
+      <span class="number" id="minutes">0</span>
+      <span class="label">Minutes</span>
+    </div>
+
+    <div class="time-segment">
+      <span class="number" id="seconds">0</span>
+      <span class="label">Seconds</span>
+    </div>
+
+    <div class="time-segment">
+      <span class="number" id="milliseconds">0</span>
+      <span class="label">Ms</span>
+    </div>
+
   </div>
 
   <div id="recommendedAudio"></div>
 
   <div class="finished-message" id="finishedMessage">
+
     <div class="finished-title">
       <span class="word-happy">Happy</span>
       <span class="word-summer">Summer</span>
       <span class="word-holiday">Holiday</span>
     </div>
-    <p class="small-text" style="color:#4193c9;">
-      From The Knights of the Generic Table
+
+    <p class="small-text" style="color:#5cc93b;">
+      Thank you for a great RR Year! We are coming back next year! Have a happy summer holiday and enjoy it to the fullest.
     </p>
+
+    <div class="medium-text">
+      Special Thanks:
+    </div>
+
     <p class="small-text">
-      
+      Rutham Renish (me), Ruhaan Renish, Dhruv Mondal, Benn Cern Tang,
+      Murdoch Mackenzie, Jenson Cooper, Xihao 'Hani' Shen,
+      Alex Stankov, Ali Heiba, Ronan Bingham,
+      Pranav Mummalaneneni, Adhrit Nirupam and YOU ALL!
     </p>
+
   </div>
-  <p class="small-text"> <br><br><br><br><br><br><br><br><br><br><br><br> </p>
-  <p class="small-text">Copyright © 2025 Rutham Renish - <a class="small-text" href="/LICENSE">Licensed by MIT</a></p>
+
   <audio id="waitAudio" preload="auto" loop src="/waitmusic.mp3"></audio>
+
   <audio id="outroAudio" preload="auto" loop src="/outromusic.mp3"></audio>
 
   <script>
-    const target = new Date(2026, 11, 5, 12, 0, 0, 0).getTime();
-    const overlay = document.getElementById("tapOverlay");
-    const cd      = document.getElementById("countdownContainer");
-    const rec     = document.getElementById("recommendedAudio");
-    const fin     = document.getElementById("finishedMessage");
-    const waitA   = document.getElementById("waitAudio");
-    const outroA  = document.getElementById("outroAudio");
 
-    let state = 0; // 0=not started,1=wait playing,2=ready-outr,3=outro
+    // DATE
+    // YEAR, MONTH(0-11), DAY, HOUR, MINUTE, SECOND
+    const targetDate = new Date(2025, 5, 27, 12, 0, 0, 0);
 
-    // mute both
-    waitA.muted = outroA.muted = true;
+    const overlay = document.getElementById("firstTapOverlay");
 
-    function init() {
-      const now = Date.now();
-      if (now >= target) {
-        // already past zero → go to finished state
-        state = 2;
-        cd.style.display = "none";
-        fin.style.display = "flex";
-        overlay.textContent = "Tap to see our final message";
-        overlay.classList.remove("hidden");
-      } else {
-        overlay.textContent = "Tap to see and hear the countdown - Audio Recommended";
-        overlay.classList.remove("hidden");
-      }
+    const countdownDiv = document.getElementById("countdownContainer");
+
+    const recommendedDiv = document.getElementById("recommendedAudio");
+
+    const finishedDiv = document.getElementById("finishedMessage");
+
+    const waitAudio = document.getElementById("waitAudio");
+
+    const outroAudio = document.getElementById("outroAudio");
+
+    let timerID;
+
+    let state = 0;
+    // 0 = before start
+    // 1 = wait music
+    // 2 = waiting for outro tap
+    // 3 = outro playing
+
+    waitAudio.muted = true;
+    outroAudio.muted = true;
+
+    function startWaitMusic() {
+
+      waitAudio.muted = false;
+
+      waitAudio.currentTime = 0;
+
+      waitAudio.play().catch(() => {});
+
+      recommendedDiv.textContent =
+        "Audio Recommended – Assumptions, Sam Gellaitry";
+
+      recommendedDiv.style.display = "block";
     }
 
-    overlay.addEventListener("click", () => {
-      const now = Date.now(), diff = target - now;
-      if (state === 0 && now < target) {
-        // start wait
-        state = 1;
-        overlay.classList.add("hidden");
-        waitA.muted = false;
-        waitA.play().catch(() => {});
-        rec.textContent = "Audio Recommended – Healin On The Move, Doctornewflow";
-        rec.style.display = "block";
-      } else if (state === 2) {
-        // start outro
-        state = 3;
-        overlay.classList.add("hidden");
-        rec.style.display = "none";
-        const offset = diff > 0
-          ? (61000 - diff) / 1000
-          : 61;
-        outroA.muted = false;
-        outroA.currentTime = offset > outroA.duration ? 0 : offset;
-        outroA.play().catch(() => {});
-        rec.textContent = "Audio Recommended A LOT – Xenogenisis, TheFatRat";
-        rec.style.display = "block";
-        if (diff <= 0) {
-          cd.style.display = "none";
-          fin.style.display = "flex";
-        }
-      }
-    });
+    function startOutroMusic() {
 
-    function schedule() {
-      if (state === 1) {
-        const diff = target - Date.now();
-        if (diff <= 60000 && diff > 0) {
-          // switch to outro-ready
+      const diff = targetDate - Date.now();
+
+      const outroOffset = diff > 0
+        ? (61000 - diff) / 1000
+        : 61;
+
+      outroAudio.muted = false;
+
+      outroAudio.currentTime =
+        outroOffset > outroAudio.duration
+          ? 0
+          : outroOffset;
+
+      outroAudio.play().catch(() => {});
+
+      recommendedDiv.textContent =
+        "Turn up volume, PLEASE TAP THE SCREEN AGAIN Audio Recommended A LOT – Xenogenesis, TheFatRat";
+
+      recommendedDiv.style.display = "block";
+    }
+
+    function updateCountdown() {
+
+      const now = Date.now();
+
+      const diff = targetDate - now;
+
+      // COUNTDOWN FINISHED
+      if (diff <= 0) {
+
+        clearInterval(timerID);
+
+        countdownDiv.style.display = "none";
+
+        recommendedDiv.style.display = "none";
+
+        finishedDiv.style.display = "flex";
+
+        waitAudio.pause();
+
+        waitAudio.currentTime = 0;
+
+        // refresh after zero
+        if (state !== 3) {
+
           state = 2;
-          waitA.pause();
-          waitA.currentTime = 0;
-          rec.style.display = "none";
-          overlay.textContent = "Tap to countdown - Audio Recommended A LOT";
+
+          overlay.textContent =
+            "Tap to play outro music";
+
           overlay.classList.remove("hidden");
         }
-      }
-    }
 
-    function update() {
-      const now = Date.now(), diff = target - now;
-
-      // **NEW**: handle zero here
-      if (diff <= 0) {
-        clearInterval(timer);
-        // hide countdown & rec
-        cd.style.display = "none";
-        rec.style.display = "none";
-        // show finished
-        fin.style.display = "flex";
         return;
       }
 
-      // update numbers
-      let d = diff;
-      const w    = Math.floor(d / 604800000); d %= 604800000;
-      const days = Math.floor(d / 86400000);  d %= 86400000;
-      const hrs  = Math.floor(d / 3600000);   d %= 3600000;
-      const mins = Math.floor(d / 60000);     d %= 60000;
-      const secs = Math.floor(d / 1000), ms = d % 1000;
-      document.getElementById("weeks").textContent        = w;
-      document.getElementById("days").textContent         = days;
-      document.getElementById("hours").textContent        = hrs;
-      document.getElementById("minutes").textContent      = mins;
-      document.getElementById("seconds").textContent      = secs;
-      document.getElementById("milliseconds").textContent = ms;
+      // SWITCH TO OUTRO PHASE
+      if (diff <= 60000 && state === 1) {
 
-      schedule();
+        state = 2;
+
+        waitAudio.pause();
+
+        waitAudio.currentTime = 0;
+
+        recommendedDiv.style.display = "none";
+
+        overlay.textContent =
+          "Tap to countdown - Audio Recommended A LOT";
+
+        overlay.classList.remove("hidden");
+      }
+
+      // COUNTDOWN DISPLAY
+      let d = diff;
+
+      const weeks = Math.floor(d / 604800000);
+      d %= 604800000;
+
+      const days = Math.floor(d / 86400000);
+      d %= 86400000;
+
+      const hours = Math.floor(d / 3600000);
+      d %= 3600000;
+
+      const minutes = Math.floor(d / 60000);
+      d %= 60000;
+
+      const seconds = Math.floor(d / 1000);
+
+      const milliseconds = d % 1000;
+
+      document.getElementById("weeks").textContent = weeks;
+
+      document.getElementById("days").textContent = days;
+
+      document.getElementById("hours").textContent = hours;
+
+      document.getElementById("minutes").textContent = minutes;
+
+      document.getElementById("seconds").textContent = seconds;
+
+      document.getElementById("milliseconds").textContent = milliseconds;
     }
 
-    init();
-    const timer = setInterval(update, 1);
-    update();
+    // INITIAL STATE
+    if (Date.now() >= targetDate) {
+
+      countdownDiv.style.display = "none";
+
+      finishedDiv.style.display = "flex";
+
+      overlay.textContent =
+        "Tap to play outro music";
+
+      overlay.classList.remove("hidden");
+
+      state = 2;
+    }
+
+    overlay.addEventListener("click", () => {
+
+      // FIRST START
+      if (state === 0) {
+
+        state = 1;
+
+        overlay.classList.add("hidden");
+
+        startWaitMusic();
+      }
+
+      // START OUTRO
+      else if (state === 2) {
+
+        state = 3;
+
+        overlay.classList.add("hidden");
+
+        startOutroMusic();
+      }
+    });
+
+    timerID = setInterval(updateCountdown, 1);
+
+    updateCountdown();
+
   </script>
-  <script src="/celebration.js"></script>
+
 </body>
 </html>
