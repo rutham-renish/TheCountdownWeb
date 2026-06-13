@@ -5,91 +5,219 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Countdown Web</title>
   <link rel="icon" type="image/jpeg" href="https://www.publicdomainpictures.net/pictures/80000/velka/clock-icon.jpg">
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="3d6feec7-b8c6-403a-a721-f5254bb3151a"></script>
   <style>
-    @font-face { font-family: "TheRRs"; src: url("/therrfont.ttf") format("truetype"); }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; }
-    body {
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      background: #2a2a2a; color: #dedede; font-family: "TheRRs", sans-serif;
-      font-size: 16px; line-height: 1.2; position: relative; overflow: hidden;
-    }
-    .countdown { display: flex; gap: 1.5rem; text-align: center; }
-    .time-segment { display: flex; flex-direction: column; min-width: 4rem; }
-    .number {
-      display: inline-block; width: 4ch; font-size: 3rem; line-height: 1;
-      color: #4193c9; text-align: center; font-variant-numeric: tabular-nums;
-    }
-    .label {
-      margin-top: .25rem; font-size: 1rem; color: #5cc93b;
-      text-transform: uppercase; letter-spacing: .05em;
-    }
-    #recommendedAudio {
-      margin-top: 1rem; font-size: 1rem; display: none;
-    }
-    .finished-message {
-      display: none; flex-direction: column; align-items: center; text-align: center;
-      gap: 1rem; padding: 0 1rem;
-    }
-    .finished-title { display: flex; gap: .5rem; font-size: 3rem; }
-    .word-happy { color: #5cc93b; }
-    .word-summer { color: #dedede; }
-    .word-holiday { color: #4193c9; }
-    .small-text {
-      font-size: .875rem; color: #dedede; margin: .25rem 0;
-    }
-    .medium-text {
-      font-size: 1.25rem; color: #4193c9; margin: .5rem 0 .25rem;
-    }
-    #tapOverlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(42,42,42,.95); color: #dedede;
-      display: flex; justify-content: center; align-items: center;
-      text-align: center; font-size: 1.2rem; cursor: pointer; z-index: 9999;
-      padding: 1rem;
-    }
-    #tapOverlay.hidden { display: none; }
-  </style>
-</head>
-<body>
-  <div id="tapOverlay">Tap to see and hear the countdown - Audio Recommended</div>
+  @font-face {
+    font-family: "TheRRs";
+    src: url("/therrfont.ttf") format("truetype");
+  }
 
-  <div class="countdown" id="countdownContainer">
-    <div class="time-segment"><span id="weeks" class="number">0</span><span class="label">Weeks</span></div>
-    <div class="time-segment"><span id="days" class="number">0</span><span class="label">Days</span></div>
-    <div class="time-segment"><span id="hours" class="number">0</span><span class="label">Hours</span></div>
-    <div class="time-segment"><span id="minutes" class="number">0</span><span class="label">Minutes</span></div>
-    <div class="time-segment"><span id="seconds" class="number">0</span><span class="label">Seconds</span></div>
-    <div class="time-segment"><span id="milliseconds" class="number">0</span><span class="label">Ms</span></div>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #2a2a2a;
+    color: #dedede;
+    font-family: "TheRRs", sans-serif;
+    font-size: 16px;
+    line-height: 1.2;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .countdown {
+    display: flex;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .time-segment {
+    display: flex;
+    flex-direction: column;
+    min-width: 4rem;
+  }
+
+  .number {
+    display: inline-block;
+    width: 4ch;
+    font-size: 3rem;
+    line-height: 1;
+    color: #4193c9;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .label {
+    margin-top: .25rem;
+    font-size: 1rem;
+    color: #5cc93b;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  #recommendedAudio {
+    margin-top: 1rem;
+    font-size: 1rem;
+    display: none;
+    text-align: center;
+  }
+
+  .finished-message {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .finished-title {
+    display: flex;
+    gap: .5rem;
+    font-size: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .word-happy {
+    color: #5cc93b;
+  }
+
+  .word-summer {
+    color: #dedede;
+  }
+
+  .word-holiday {
+    color: #4193c9;
+  }
+
+  .small-text {
+    font-size: .875rem;
+    color: #dedede;
+    margin: .25rem 0;
+  }
+
+  #tapOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(42,42,42,.95);
+    color: #dedede;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 9999;
+    padding: 1rem;
+  }
+
+  #tapOverlay.hidden {
+    display: none;
+  }
+</style>
+
+<div id="tapOverlay">
+  Tap to see and hear the countdown - Audio Recommended
+</div>
+
+<div class="countdown" id="countdownContainer">
+
+  <div class="time-segment">
+    <span id="weeks" class="number">0</span>
+    <span class="label">Weeks</span>
   </div>
 
-  <div id="recommendedAudio"></div>
-
-  <div class="finished-message" id="finishedMessage">
-    <div class="finished-title">
-      <span class="word-happy">Happy</span>
-      <span class="word-summer">Summer</span>
-      <span class="word-holiday">Holiday</span>
-    </div>
-    <p class="small-text" style="color:#4193c9;">
-      From The Knights of the Generic Table
-    </p>
-    <p class="small-text">
-      
-    </p>
+  <div class="time-segment">
+    <span id="days" class="number">0</span>
+    <span class="label">Days</span>
   </div>
-  <p class="small-text"> <br><br><br><br><br><br><br><br><br><br><br><br> </p>
-  <p class="small-text">Copyright © 2025 Rutham Renish - <a class="small-text" href="/LICENSE">Licensed by MIT</a></p>
-  <audio id="waitAudio" preload="metadata" loop>
+
+  <div class="time-segment">
+    <span id="hours" class="number">0</span>
+    <span class="label">Hours</span>
+  </div>
+
+  <div class="time-segment">
+    <span id="minutes" class="number">0</span>
+    <span class="label">Minutes</span>
+  </div>
+
+  <div class="time-segment">
+    <span id="seconds" class="number">0</span>
+    <span class="label">Seconds</span>
+  </div>
+
+  <div class="time-segment">
+    <span id="milliseconds" class="number">000</span>
+    <span class="label">Ms</span>
+  </div>
+
+</div>
+
+<div id="recommendedAudio"></div>
+
+<div class="finished-message" id="finishedMessage">
+
+  <div class="finished-title">
+    <span class="word-happy">Happy</span>
+    <span class="word-summer">Summer</span>
+    <span class="word-holiday">Holiday</span>
+  </div>
+
+  <p class="small-text" style="color:#4193c9;">
+    From The Knights of the Generic Table
+  </p>
+
+</div>
+
+<p class="small-text">
+  <br><br><br><br><br><br><br><br><br><br><br><br>
+</p>
+
+<p class="small-text">
+  Copyright © 2025 Rutham Renish -
+  <a class="small-text" href="/LICENSE">Licensed by MIT</a>
+</p>
+
+<!-- IMPORTANT: playsinline helps Safari -->
+<audio
+  id="waitAudio"
+  preload="auto"
+  loop
+  playsinline
+  webkit-playsinline
+>
   <source src="/waitmusic.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="outroAudio" preload="metadata" loop>
+<audio
+  id="outroAudio"
+  preload="auto"
+  loop
+  playsinline
+  webkit-playsinline
+>
   <source src="/outromusic.mp3" type="audio/mpeg">
 </audio>
 
-  <script>
+<script>
+
   const target = new Date(2026, 11, 5, 12, 0, 0, 0).getTime();
 
   const overlay = document.getElementById("tapOverlay");
@@ -101,39 +229,70 @@
   const outroA = document.getElementById("outroAudio");
 
   let state = 0;
-  // 0 = waiting for first tap
-  // 1 = countdown active
-  // 2 = outro ready
-  // 3 = outro playing
-  // 4 = finished
 
-  // Safari-safe preload
-  waitA.load();
-  outroA.load();
+  // SAFARI FIX
+  waitA.volume = 1;
+  outroA.volume = 1;
 
   function init() {
+
     const now = Date.now();
 
     if (now >= target) {
+
       state = 2;
 
       cd.style.display = "none";
       fin.style.display = "flex";
 
-      overlay.textContent = "Tap to hear the final music";
-      overlay.classList.remove("hidden");
+      overlay.textContent =
+        "Tap to hear the final countdown music";
+
     } else {
+
       overlay.textContent =
         "Tap to see and hear the countdown - Audio Recommended";
 
-      overlay.classList.remove("hidden");
+    }
+
+    overlay.classList.remove("hidden");
+  }
+
+  // PRE-WARM AUDIO FOR SAFARI
+  async function unlockAudio(audio) {
+
+    try {
+
+      audio.muted = true;
+
+      await audio.play();
+
+      audio.pause();
+
+      audio.currentTime = 0;
+
+      audio.muted = false;
+
+      return true;
+
+    } catch (err) {
+
+      console.log("Unlock failed:", err);
+
+      return false;
+
     }
   }
 
   overlay.addEventListener("click", async () => {
+
     try {
 
-      // START COUNTDOWN MUSIC
+      // UNLOCK BOTH AUDIOS FIRST
+      await unlockAudio(waitA);
+      await unlockAudio(outroA);
+
+      // START WAIT MUSIC
       if (state === 0) {
 
         state = 1;
@@ -144,13 +303,15 @@
 
         await waitA.play();
 
-        rec.textContent =
-          "Audio Recommended – Healin On The Move, Doctornewflow";
+        rec.innerHTML = `
+          Audio Recommended – Healin On The Move, Doctornewflow
+        `;
 
         rec.style.display = "block";
+
       }
 
-      // START OUTRO MUSIC
+      // START OUTRO
       else if (state === 2) {
 
         state = 3;
@@ -160,8 +321,6 @@
         waitA.pause();
         waitA.currentTime = 0;
 
-        rec.style.display = "none";
-
         const diff = target - Date.now();
 
         let offset = 61;
@@ -170,44 +329,47 @@
           offset = (61000 - diff) / 1000;
         }
 
-        // Safari-safe seeking
-        if (!isNaN(outroA.duration)) {
+        // IMPORTANT SAFARI FIX:
+        // wait until metadata exists before seeking
 
-          const safeTime = Math.min(
+        if (outroA.readyState >= 1) {
+
+          const maxTime = Math.max(outroA.duration - 0.1, 0);
+
+          outroA.currentTime = Math.min(
             Math.max(offset, 0),
-            Math.max(outroA.duration - 0.1, 0)
+            maxTime
           );
-
-          outroA.currentTime = safeTime;
-
-        } else {
-
-          outroA.currentTime = 0;
 
         }
 
         await outroA.play();
 
-        rec.textContent =
-          "Audio Recommended A LOT – Xenogenesis, TheFatRat";
+        rec.innerHTML = `
+          Audio Recommended A LOT – Xenogenesis, TheFatRat
+        `;
 
         rec.style.display = "block";
 
         if (diff <= 0) {
+
           cd.style.display = "none";
           fin.style.display = "flex";
+
         }
+
       }
 
     } catch (err) {
 
-      console.log("Audio playback failed:", err);
+      console.log("Playback error:", err);
 
       alert(
-        "Audio could not play. Try turning off silent mode or checking browser permissions."
+        "Safari blocked the audio. Check silent mode and browser audio permissions."
       );
 
     }
+
   });
 
   function schedule() {
@@ -226,11 +388,14 @@
         rec.style.display = "none";
 
         overlay.textContent =
-          "Tap to start final countdown - Audio Recommended A LOT";
+          "Tap to countdown - Audio Recommended A LOT";
 
         overlay.classList.remove("hidden");
+
       }
+
     }
+
   }
 
   function update() {
@@ -240,17 +405,15 @@
     const diff = target - now;
 
     // FINISHED
+
     if (diff <= 0) {
 
-      if (state !== 3 && state !== 4) {
-
-        state = 4;
+      if (state !== 3) {
 
         cd.style.display = "none";
-
         rec.style.display = "none";
-
         fin.style.display = "flex";
+
       }
 
       return;
@@ -279,18 +442,21 @@
     document.getElementById("hours").textContent = hours;
     document.getElementById("minutes").textContent = minutes;
     document.getElementById("seconds").textContent = seconds;
+
     document.getElementById("milliseconds").textContent =
       milliseconds.toString().padStart(3, "0");
 
     schedule();
+
   }
 
   init();
 
-  // 50ms is MUCH safer than 1ms
-  const timer = setInterval(update, 50);
+  // MUCH safer than 1ms
+  setInterval(update, 50);
 
   update();
+
 </script>
   <script src="/celebration.js"></script>
 </body>
